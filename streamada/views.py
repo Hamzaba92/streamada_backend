@@ -10,6 +10,7 @@ from django.contrib.auth.models import User
 from rest_framework.permissions import AllowAny
 from rest_framework import serializers
 from streamada.serializers import UserSerializer
+from django.shortcuts import redirect
 
 
 
@@ -35,8 +36,9 @@ def activate_user(request, uidb64, token):
         if not user.is_active:
             user.is_active = True
             user.save()
-            return Response({'message': 'Account successfully activated'}, status=status.HTTP_200_OK)
+            return redirect('http://localhost:4200/login')
         else:
-            return Response({'message': 'Account already activated'}, status=status.HTTP_200_OK)
+            return redirect('http://localhost:4200/login')
     else:
         return Response({'error': 'Invalid activation link'}, status=status.HTTP_400_BAD_REQUEST)
+
