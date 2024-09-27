@@ -1,11 +1,11 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from django.contrib.auth.password_validation import validate_password
-from django.core.mail import send_mail
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
-
+from django.template.loader import render_to_string
+from django.core.mail import EmailMultiAlternatives
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
@@ -47,13 +47,21 @@ class UserSerializer(serializers.ModelSerializer):
 
         activation_link = f"{self.context['request'].scheme}://{self.context['request'].get_host()}/api/activate/{uid}/{token}/"
 
+        subject = 'Please Confirm your E-mail'
+        from_email = 'noreply@streamada.com'
+        recipient_list = [user.email]
 
-        #E-mail send
-        send_mail(
-            subject='Please Confirm your E-mail',
-            message=f'Hallo {user.first_name} {user.last_name},\nPlease click the link below to activate your account:\n{activation_link}',
-            from_email='noreply@streamada.com',
-            recipient_list=[user.email],
-            fail_silently=False,
+        html_message = render_to_string('send_activation_link.html', {
+            'user': user,
+            'activation_link': activation_link
+        })
+
+        email = EmailMultiAlternatives(
+            subject=subject,
+            body=f'Hallo {user.first_name} {user.last_name},\nPlease click the link below to activate your account:\n{activation_link}',
+            from_email=from_email,
+            to=recipient_list
         )
+        email.attach_alternative(html_message, "text/html")
+        email.send()
         return user

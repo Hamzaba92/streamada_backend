@@ -15,13 +15,15 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from django.shortcuts import redirect
 
 from streamada.views import activate_user, register_user
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', lambda request: redirect('admin/')),
     path('api/register/', register_user, name='register_user'),
     path('api/activate/<uidb64>/<token>/', activate_user, name='activate'),
 ]
