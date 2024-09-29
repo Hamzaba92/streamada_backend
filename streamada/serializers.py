@@ -113,7 +113,7 @@ class PasswordResetSerializer(serializers.Serializer):
         token = default_token_generator.make_token(user)
         uid = urlsafe_base64_encode(force_bytes(user.pk))
 
-        reset_link = f"{request.scheme}://{request.get_host()}/reset-password/{uid}/{token}/"
+        reset_link = f"http://localhost:4200/reset-password/{uid}/{token}/"
 
         subject = 'Reset Password'
         from_email = 'noreply@streamada.com'
@@ -132,3 +132,5 @@ class PasswordResetSerializer(serializers.Serializer):
         )
         email_message.attach_alternative(html_message, "text/html")
         email_message.send()
+
+        return {'uid': uid, 'token': token}

@@ -1,3 +1,4 @@
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -63,22 +64,16 @@ def login_user(request):
     return Response(serializer.errors, status=400)
 
 
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def logout_user(request):
-    try:
-        request.user.auth_token.delete()
-    except (AttributeError, Token.DoesNotExist):
-        pass
-    return Response({'message': 'Logout erfolgreich.'}, status=status.HTTP_200_OK)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
 class PasswordResetView(APIView):
     permission_classes = [AllowAny]
+
     def post(self, request, *args, **kwargs):
         serializer = PasswordResetSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
-            serializer.save()
-            return Response({"detail": "E-mail send"}, status=status.HTTP_200_OK)
+            data = serializer.save()
+            return JsonResponse({'detail': 'Password reset link has been sent.'}, status=200)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
