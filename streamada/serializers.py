@@ -6,6 +6,7 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
+from django.contrib.auth import authenticate
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
@@ -65,3 +66,29 @@ class UserSerializer(serializers.ModelSerializer):
         email.attach_alternative(html_message, "text/html")
         email.send()
         return user
+
+
+
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    password = serializers.CharField(write_only=True, required=True)
+    
+    def validate(self, data):
+        email = data.get('email')
+        password = data.get('password')
+        
+        
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise serializers.ValidationError("User dosen't exist.")
+        
+        if not user.is_active:
+            raise serializers.ValidationError("Acount not activated, check your email.")
+        
+        user = authenticate(username=email, password=password)
+        if user is None:
+            raise serializers.ValidationError("password is wrong.")
+        
+        data['user'] = user
+        return data 
