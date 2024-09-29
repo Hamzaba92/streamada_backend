@@ -15,11 +15,11 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path
 from django.shortcuts import redirect
 
 from streamada import views
-from streamada.views import activate_user, logout_user, register_user
+from streamada.views import PasswordResetView, activate_user, register_user
 
 
 urlpatterns = [
@@ -28,7 +28,7 @@ urlpatterns = [
     path('api/register/', register_user, name='register_user'),
     path('api/activate/<uidb64>/<token>/', activate_user, name='activate'),
     path('api/login/', views.login_user, name='login'),
-    path('api/logout/', logout_user, name='api_logout'),
+    path('api/password-reset/', PasswordResetView.as_view(), name='password_reset'),
 ]
 
     

@@ -77,7 +77,6 @@ class LoginSerializer(serializers.Serializer):
         email = data.get('email')
         password = data.get('password')
         
-        
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
@@ -92,3 +91,44 @@ class LoginSerializer(serializers.Serializer):
         
         data['user'] = user
         return data 
+    
+
+
+class PasswordResetSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    def validate_email(self, value):
+        if not User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("User dosen't exist with this email.")
+        return value
+    
+    def save(self):
+        request = self.context.get('request', None)
+        if not request:
+            raise Exception("Request is not in serializer context")
+
+        email = self.validated_data['email']
+        user = User.objects.get(username=email)
+
+        token = default_token_generator.make_token(user)
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+        reset_link = f"{request.scheme}://{request.get_host()}/reset-password/{uid}/{token}/"
+
+        subject = 'Reset Password'
+        from_email = 'noreply@streamada.com'
+        recipient_list = [user.email]
+
+        html_message = render_to_string('reset_password_email.html', {
+            'user': user,
+            'reset_link': reset_link
+        })
+
+        email_message = EmailMultiAlternatives(
+            subject=subject,
+            body=f'Hallo {user.first_name},\nPlease click the link below to reset your passwort:\n{reset_link}',
+            from_email=from_email,
+            to=recipient_list
+        )
+        email_message.attach_alternative(html_message, "text/html")
+        email_message.send()
