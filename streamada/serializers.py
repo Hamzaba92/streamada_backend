@@ -7,6 +7,9 @@ from django.utils.encoding import force_bytes
 from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
 from django.contrib.auth import authenticate
+from django.utils.http import urlsafe_base64_decode
+
+
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
@@ -134,3 +137,29 @@ class PasswordResetSerializer(serializers.Serializer):
         email_message.send()
 
         return {'uid': uid, 'token': token}
+    
+
+
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    uid = serializers.CharField()
+    token = serializers.CharField()
+    new_password = serializers.CharField(write_only=True)
+
+    def validate(self, attrs):
+        try:
+            uid = urlsafe_base64_decode(attrs['uid']).decode()
+            user = User.objects.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            raise serializers.ValidationError('Invalid UID')
+
+        if not default_token_generator.check_token(user, attrs['token']):
+            raise serializers.ValidationError('Invalid token')
+
+        return attrs
+
+    def save(self):
+        uid = urlsafe_base64_decode(self.validated_data['uid']).decode()
+        user = User.objects.get(pk=uid)
+        user.set_password(self.validated_data['new_password'])
+        user.save()
+        return user

@@ -14,7 +14,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from django.views.decorators.csrf import csrf_exempt
-from .serializers import PasswordResetSerializer
+from .serializers import PasswordResetConfirmSerializer, PasswordResetSerializer
 from rest_framework.views import APIView
 from django.utils.decorators import method_decorator
 
@@ -76,4 +76,17 @@ class PasswordResetView(APIView):
             data = serializer.save()
             return JsonResponse({'detail': 'Password reset link has been sent.'}, status=200)
 
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class PasswordResetConfirmView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        serializer = PasswordResetConfirmSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'detail': 'Password has been reset successfully.'}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

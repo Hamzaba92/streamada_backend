@@ -19,7 +19,7 @@ from django.urls import path
 from django.shortcuts import redirect
 
 from streamada import views
-from streamada.views import PasswordResetView, activate_user, register_user
+from streamada.views import PasswordResetConfirmView, PasswordResetView, activate_user, register_user
 
 
 urlpatterns = [
@@ -29,6 +29,7 @@ urlpatterns = [
     path('api/activate/<uidb64>/<token>/', activate_user, name='activate'),
     path('api/login/', views.login_user, name='login'),
     path('api/password-reset/', PasswordResetView.as_view(), name='password_reset'),
+    path('api/confirm-new-pw/', PasswordResetConfirmView.as_view(), name='confirm-new-pw'),
 ]
 
     
