@@ -59,7 +59,9 @@ def login_user(request):
         token, created = Token.objects.get_or_create(user=user)
         return Response({
             'token': token.key,
-            'message': 'Login erfolgreich.'
+            'message': 'Login successful.',
+            'first_name': user.first_name,
+            'last_name': user.last_name
         }, status=200)
     return Response(serializer.errors, status=400)
 
