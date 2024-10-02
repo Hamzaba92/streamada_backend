@@ -2,8 +2,9 @@ from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from streamada.models import Video
 import os
-
+import django_rq
 from streamada.tasks import convert_video
+
 
 
 @receiver(post_save, sender=Video)
@@ -11,21 +12,34 @@ def video_post_save(sender, instance, created, **kwargs):
     if created:
         print('New Video created')
 
-
-        video_base_path = instance.video_file.path.replace('.mp4', '')
+        # Wandle den Pfad für WSL um, falls es sich um einen Windows-Pfad handelt
+        video_base_path = (instance.video_file.path.replace('.mp4', ''))
         versions = ['_480p.mp4', '_720p.mp4', '_1080p.mp4']
+
         for version in versions:
             version_path = video_base_path + version
             if os.path.isfile(version_path):
                 raise ValueError(f"The file '{version_path}' already exists. Please remove it before uploading a new video.")
 
-        convert_video(instance.video_file.path, 'hd480', '480p')
-        convert_video(instance.video_file.path, 'hd720', '720p')
-        convert_video(instance.video_file.path, 'hd1080', '1080p')
+        # RQ-Queue, get the default worker
+        queue = django_rq.get_queue('default')
 
-    """Delet's the uploadfile in raw"""
-    if os.path.isfile(instance.video_file.path):
-        os.remove(instance.video_file.path)
+        # manage the queue
+        video_path = (instance.video_file.path)
+        job_480p = queue.enqueue(convert_video, video_path, 'hd480', '480p')
+        job_720p = queue.enqueue(convert_video, video_path, 'hd720', '720p', depends_on=job_480p)
+        job_1080p = queue.enqueue(convert_video, video_path, 'hd1080', '1080p', depends_on=job_720p)
+
+        queue.enqueue(delete_original_file, video_path, depends_on=job_1080p)
+
+
+
+def delete_original_file(file_path):
+    if os.path.isfile(file_path):
+        os.remove(file_path)
+        print(f"Uploadfile deleted: {file_path}")
+    else:
+        print(f"uploadfile not found: {file_path}")
 
 
 
