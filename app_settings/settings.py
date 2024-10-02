@@ -97,8 +97,20 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'app_settings.wsgi.application'
+CACHES = {  
+      "default": {  
+                    "BACKEND": "django_redis.cache.RedisCache",
+                    "LOCATION": "redis://127.0.0.1:6379/1",        
+                    "OPTIONS": {
+                          "CLIENT_CLASS": "django_redis.client.DefaultClient"
+                        }, 
+                        "KEY_PREFIX": "streamada"    
+                }
 
+        }
+
+
+WSGI_APPLICATION = 'app_settings.wsgi.application'
 
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -138,7 +150,7 @@ DATABASES = {
     }
 }
 
-SECRET_KEY = config('DJANGO_SECRET_KEY')
+SECRET_KEY = config('DJANGO_SECRET_KEY', default='fallback-secret-key')
 
 EMAIL_BACKEND = config('EMAIL_BACKEND')
 EMAIL_HOST = config('EMAIL_HOST')
