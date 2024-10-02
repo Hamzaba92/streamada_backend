@@ -10,6 +10,15 @@ from streamada.tasks import convert_video
 def video_post_save(sender, instance, created, **kwargs):
     if created:
         print('New Video created')
+
+
+        video_base_path = instance.video_file.path.replace('.mp4', '')
+        versions = ['_480p.mp4', '_720p.mp4', '_1080p.mp4']
+        for version in versions:
+            version_path = video_base_path + version
+            if os.path.isfile(version_path):
+                raise ValueError(f"The file '{version_path}' already exists. Please remove it before uploading a new video.")
+
         convert_video(instance.video_file.path, 'hd480', '480p')
         convert_video(instance.video_file.path, 'hd720', '720p')
         convert_video(instance.video_file.path, 'hd1080', '1080p')
