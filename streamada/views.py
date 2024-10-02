@@ -8,6 +8,7 @@ from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_str
 from django.contrib.auth.models import User
 from rest_framework.permissions import AllowAny
+from app_settings.settings import CACHE_TTL
 from streamada.serializers import UserSerializer, LoginSerializer
 from django.shortcuts import redirect
 from rest_framework.authtoken.models import Token
@@ -17,6 +18,9 @@ from django.views.decorators.csrf import csrf_exempt
 from .serializers import PasswordResetConfirmSerializer, PasswordResetSerializer
 from rest_framework.views import APIView
 from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+
+
 
 @csrf_exempt
 @api_view(['POST'])
@@ -51,7 +55,8 @@ def activate_user(request, uidb64, token):
 
 @csrf_exempt
 @api_view(['POST'])
-@permission_classes([AllowAny]) 
+@permission_classes([AllowAny])
+@cache_page(CACHE_TTL) 
 def login_user(request):
     serializer = LoginSerializer(data=request.data)
     if serializer.is_valid():

@@ -13,7 +13,14 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 from decouple import config
 import os
+import sys
 from corsheaders.defaults import default_headers
+from django.conf import settings
+from django.core.cache.backends.base import DEFAULT_TIMEOUT
+
+
+
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -26,6 +33,10 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 CORS_ALLOW_CREDENTIALS = True
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
 
 CORS_ALLOW_HEADERS = list(default_headers) + [
     'Authorization',
@@ -40,7 +51,6 @@ CORS_ALLOW_METHODS = [
     'OPTIONS',
 ]
 
-DEBUG = True
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -53,9 +63,12 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
+    'debug_toolbar'
+    
 ]
 
 MIDDLEWARE = [
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -80,6 +93,21 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 ROOT_URLCONF = 'app_settings.urls'
+
+
+# Debug mode from .env file
+DEBUG = config('DEBUG', default=False, cast=bool)
+
+# Check if we're running tests to disable the toolbar
+TESTING = len(sys.argv) > 1 and sys.argv[1] == 'test'
+
+
+if DEBUG and not TESTING:
+    if 'debug_toolbar' not in INSTALLED_APPS:
+        INSTALLED_APPS += ['debug_toolbar']
+    if 'debug_toolbar.middleware.DebugToolbarMiddleware' not in MIDDLEWARE:
+        MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
+
 
 TEMPLATES = [
     {
@@ -109,6 +137,7 @@ CACHES = {
 
         }
 
+CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 
 WSGI_APPLICATION = 'app_settings.wsgi.application'
 
