@@ -15,12 +15,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
 from django.shortcuts import redirect
 from debug_toolbar.toolbar import debug_toolbar_urls
 from streamada import views
 from streamada.views import PasswordResetConfirmView, PasswordResetView, activate_user, register_user
-
+from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -30,7 +30,11 @@ urlpatterns = [
     path('api/login/', views.login_user, name='login'),
     path('api/password-reset/', PasswordResetView.as_view(), name='password_reset'),
     path('api/confirm-new-pw/', PasswordResetConfirmView.as_view(), name='confirm-new-pw'),
+    path('django-rq/', include('django_rq.urls'))
 ]+ debug_toolbar_urls()
 
-    
+
+if settings.DEBUG and not settings.TESTING:
+    import debug_toolbar
+    urlpatterns += [path('__debug__/', include(debug_toolbar.urls))]
 

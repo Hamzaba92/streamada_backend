@@ -2,6 +2,7 @@ from django.db import models
 from django.core.exceptions import ValidationError
 import os
 
+
 GENRE_CHOICES = [
     ('new_on_streamada', 'New on Streamada'),
     ('sport', 'Sport'),
@@ -54,3 +55,7 @@ class Video(models.Model):
         """Ensure validation is called before saving."""
         self.full_clean() 
         super(Video, self).save(*args, **kwargs)
+
+
+
+

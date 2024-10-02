@@ -63,7 +63,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
-    'debug_toolbar'
+    'debug_toolbar',
+    'django_rq',
     
 ]
 
@@ -93,6 +94,18 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 ROOT_URLCONF = 'app_settings.urls'
+
+
+
+RQ_QUEUES = {
+    'default': {
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'DB': 0,
+        'DEFAULT_TIMEOUT': 360,
+    }
+}
+
 
 
 # Debug mode from .env file
