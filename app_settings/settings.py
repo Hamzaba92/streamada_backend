@@ -93,7 +93,7 @@ MEDIA_URL = '/media/'
 
 ROOT_URLCONF = 'app_settings.urls'
 
-
+DEBUG=True
 
 RQ_QUEUES = {
     'default': {

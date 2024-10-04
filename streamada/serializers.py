@@ -9,6 +9,8 @@ from django.core.mail import EmailMultiAlternatives
 from django.contrib.auth import authenticate
 from django.utils.http import urlsafe_base64_decode
 
+from streamada.models import Video
+
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -163,3 +165,38 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         user.set_password(self.validated_data['new_password'])
         user.save()
         return user
+    
+
+
+class VideoSerializer(serializers.ModelSerializer):
+    video_480p_url = serializers.SerializerMethodField()
+    video_720p_url = serializers.SerializerMethodField()
+    video_1080p_url = serializers.SerializerMethodField()
+    thumbnail_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Video
+        fields = [
+            'id', 'title', 'description', 'genre',
+            'video_480p_url', 'video_720p_url', 'video_1080p_url', 'thumbnail_url'
+        ]
+
+    def get_video_480p_url(self, obj):
+        request = self.context.get('request')
+        url = obj.video_480p_url
+        return request.build_absolute_uri(url) if request else url
+
+    def get_video_720p_url(self, obj):
+        request = self.context.get('request')
+        url = obj.video_720p_url
+        return request.build_absolute_uri(url) if request else url
+
+    def get_video_1080p_url(self, obj):
+        request = self.context.get('request')
+        url = obj.video_1080p_url
+        return request.build_absolute_uri(url) if request else url
+
+    def get_thumbnail_url(self, obj):
+        request = self.context.get('request')
+        url = obj.thumbnail_url
+        return request.build_absolute_uri(url) if request and url else url

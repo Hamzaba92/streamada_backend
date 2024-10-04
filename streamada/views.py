@@ -9,16 +9,18 @@ from django.utils.encoding import force_str
 from django.contrib.auth.models import User
 from rest_framework.permissions import AllowAny
 from app_settings.settings import CACHE_TTL
+from streamada.models import Video
 from streamada.serializers import UserSerializer, LoginSerializer
 from django.shortcuts import redirect
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from django.views.decorators.csrf import csrf_exempt
-from .serializers import PasswordResetConfirmSerializer, PasswordResetSerializer
+from .serializers import PasswordResetConfirmSerializer, PasswordResetSerializer, VideoSerializer
 from rest_framework.views import APIView
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
+from rest_framework import generics
 
 
 
@@ -97,3 +99,9 @@ class PasswordResetConfirmView(APIView):
             serializer.save()
             return Response({'detail': 'Password has been reset successfully.'}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+@permission_classes([AllowAny])
+class VideoListAPIView(generics.ListAPIView):
+    queryset = Video.objects.all()
+    serializer_class = VideoSerializer
