@@ -63,13 +63,11 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
-    'debug_toolbar',
     'django_rq',
     
 ]
 
 MIDDLEWARE = [
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -105,21 +103,6 @@ RQ_QUEUES = {
         'DEFAULT_TIMEOUT': 360,
     }
 }
-
-
-
-# Debug mode from .env file
-DEBUG = config('DEBUG', default=False, cast=bool)
-
-# Check if we're running tests to disable the toolbar
-TESTING = len(sys.argv) > 1 and sys.argv[1] == 'test'
-
-
-if DEBUG and not TESTING:
-    if 'debug_toolbar' not in INSTALLED_APPS:
-        INSTALLED_APPS += ['debug_toolbar']
-    if 'debug_toolbar.middleware.DebugToolbarMiddleware' not in MIDDLEWARE:
-        MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
 
 
 TEMPLATES = [
