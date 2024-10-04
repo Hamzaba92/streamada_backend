@@ -3,7 +3,7 @@ from django.dispatch import receiver
 from streamada.models import Video
 import os
 import django_rq
-from streamada.tasks import convert_video
+from streamada.tasks import convert_video, delete_original_file
 
 
 
@@ -12,7 +12,6 @@ def video_post_save(sender, instance, created, **kwargs):
     if created:
         print('New Video created')
 
-        # Wandle den Pfad für WSL um, falls es sich um einen Windows-Pfad handelt
         video_base_path = (instance.video_file.path.replace('.mp4', ''))
         versions = ['_480p.mp4', '_720p.mp4', '_1080p.mp4']
 
@@ -33,13 +32,6 @@ def video_post_save(sender, instance, created, **kwargs):
         queue.enqueue(delete_original_file, video_path, depends_on=job_1080p)
 
 
-
-def delete_original_file(file_path):
-    if os.path.isfile(file_path):
-        os.remove(file_path)
-        print(f"Uploadfile deleted: {file_path}")
-    else:
-        print(f"uploadfile not found: {file_path}")
 
 
 

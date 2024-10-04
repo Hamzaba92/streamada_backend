@@ -10,7 +10,7 @@ Ensure that the following dependencies are installed on your system:
 - Pipenv oder venv (Virtuelle Umgebung)
 - Redis (optional, for Caching)
 - PostgreSQL oder SQLite (depending on database configuration)
-- Das frontend project (required for full functionality)
+- Frontend project (required for full functionality)
 - Frontend:``` git clone https://github.com/Hamzaba92/streamada_frontend.git ```
 
 ## Local Setup
@@ -47,7 +47,7 @@ windwos: 1. => python manage.py makemigrations 2. => python manage.py migrate
 linux: python3 manage.py createsuperuser
 windows: python manage.py createsuperuser
 ```
-### 8. Starte the server
+### 8. Start the server
 ```bash
 linux: python3 manage.py runserver
 windows: python manage.py runserver

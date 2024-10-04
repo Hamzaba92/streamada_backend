@@ -1,5 +1,5 @@
 import subprocess
-
+import os
 
 
 def convert_video(source, resolution, label):
@@ -11,3 +11,15 @@ def convert_video(source, resolution, label):
     subprocess.run(cmd, shell=True)
     return target
 
+
+
+def delete_original_file(file_path):
+    print(f"Attempting to delete file: {file_path}")
+    if os.path.isfile(file_path):
+        try:
+            os.remove(file_path)
+            print(f"Uploadfile deleted: {file_path}")
+        except Exception as e:
+            print(f"Error deleting file {file_path}: {e}")
+    else:
+        print(f"Uploadfile not found: {file_path}")
