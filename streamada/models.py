@@ -27,6 +27,8 @@ class Video(models.Model):
     video_file = models.FileField(upload_to='videos/', validators=[validate_video_file])
     thumbnail = models.ImageField(upload_to='thumbnails/', blank=True, null=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
+    add_to_new_video_feed = models.BooleanField(default=False)
+
 
     def __str__(self):
         return f"[Genre]: {self.genre},  [Title]: {self.title}"

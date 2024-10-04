@@ -178,7 +178,7 @@ class VideoSerializer(serializers.ModelSerializer):
         model = Video
         fields = [
             'id', 'title', 'description', 'genre',
-            'video_480p_url', 'video_720p_url', 'video_1080p_url', 'thumbnail_url'
+            'video_480p_url', 'video_720p_url', 'video_1080p_url', 'thumbnail_url', 'add_to_new_video_feed'
         ]
 
     def get_video_480p_url(self, obj):
