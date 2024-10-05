@@ -22,6 +22,7 @@ from django.core.cache.backends.base import DEFAULT_TIMEOUT
 
 
 
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
@@ -177,8 +178,21 @@ EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 
-try:
+
+
+
+if 'test' in sys.argv or 'test_coverage' in sys.argv:
+    # Use SQLite for testing
     DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': ':memory:', 
+        }
+    }
+else:
+    # Use PostgreSQL in development and production
+    try:
+        DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': config('DB_NAME'),
@@ -188,9 +202,9 @@ try:
             'PORT': config('DB_PORT'),
         }
     }
-except UndefinedValueError:
+    except UndefinedValueError:
     # Fallback to SQLite if any PostgreSQL config is missing
-    DATABASES = {
+        DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),

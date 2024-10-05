@@ -22,6 +22,8 @@ from streamada.views import PasswordResetConfirmView, PasswordResetView, VideoLi
 from django.conf import settings
 from django.conf.urls.static import static
 
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', lambda request: redirect('admin/')),
@@ -31,7 +33,7 @@ urlpatterns = [
     path('api/password-reset/', PasswordResetView.as_view(), name='password_reset'),
     path('api/confirm-new-pw/', PasswordResetConfirmView.as_view(), name='confirm-new-pw'),
     path('api/videos/', VideoListAPIView.as_view(), name='video-list'),
-    path('django-rq/', include('django_rq.urls'))
+    path('django-rq/', include('django_rq.urls')),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
