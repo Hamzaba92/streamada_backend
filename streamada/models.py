@@ -1,8 +1,6 @@
 from django.db import models
-from django.core.exceptions import ValidationError
 import os
 from django.conf import settings
-from rest_framework import serializers
 
 
 
@@ -22,7 +20,7 @@ class Video(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(max_length=360, blank=True, null=True)
     genre = models.CharField(max_length=100, choices=GENRE_CHOICES)
-    video_file = models.FileField(upload_to='videos/', validators=[])
+    video_file = models.FileField(upload_to='videos/')
     thumbnail = models.ImageField(upload_to='thumbnails/', blank=True, null=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     add_to_new_video_feed = models.BooleanField(default=False)
@@ -30,11 +28,6 @@ class Video(models.Model):
     def __str__(self):
         return f"[Genre]: {self.genre},  [Title]: {self.title}"
     
-
-    def save(self, *args, **kwargs):
-        """Ensure validation is called before saving."""
-        self.full_clean() 
-        super(Video, self).save(*args, **kwargs)
 
 
     def get_video_version_url(self, resolution):
