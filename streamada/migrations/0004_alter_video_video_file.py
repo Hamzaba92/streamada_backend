@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='video',
             name='video_file',
-            field=models.FileField(upload_to='videos/', validators=[streamada.models.validate_video_file]),
+            field=models.FileField(upload_to='videos/', validators=[]),
         ),
     ]

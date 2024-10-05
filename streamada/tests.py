@@ -222,19 +222,23 @@ class VideoListAPIViewTest(TestCase):
             video_file=video_file2
         )
 
-    def test_video_list(self):
-        response = self.client.get(self.url)
+def test_video_list(self):
+    response = self.client.get(self.url)
 
-        videos = Video.objects.all()
-        serializer = VideoSerializer(videos, many=True)
+    self.assertEqual(response.status_code, 200, f"Expected status code 200, but got {response.status_code}")
 
-        print(response.status_code)
-        print(response.json())
+    videos = Video.objects.all()
+    serializer = VideoSerializer(videos, many=True)
 
-        for response_video, expected_video in zip(response.json(), serializer.data):
-            self.assertEqual(response_video['title'], expected_video['title'])
-            self.assertEqual(response_video['description'], expected_video['description'])
-            self.assertEqual(response_video['genre'], expected_video['genre'])
+    print("Response JSON:", response.json())
+
+    response_data = response.json()
+    self.assertIsInstance(response_data, list, "Expected a list in response.json()")
+
+    for response_video, expected_video in zip(response_data, serializer.data):
+        self.assertEqual(response_video['title'], expected_video['title'])
+        self.assertEqual(response_video['description'], expected_video['description'])
+        self.assertEqual(response_video['genre'], expected_video['genre'])
 
 
 

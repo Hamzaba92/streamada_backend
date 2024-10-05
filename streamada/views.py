@@ -101,7 +101,24 @@ class PasswordResetConfirmView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 class VideoListAPIView(generics.ListAPIView):
     queryset = Video.objects.all()
     serializer_class = VideoSerializer
+
+
+
+@permission_classes([IsAuthenticated])
+class VideoDetailAPIView(generics.RetrieveUpdateAPIView):
+    queryset = Video.objects.all()
+    serializer_class = VideoSerializer
+    lookup_field = 'id'
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        return Response(serializer.data)

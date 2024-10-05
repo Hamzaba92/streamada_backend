@@ -25,12 +25,16 @@ from django.core.cache.backends.base import DEFAULT_TIMEOUT
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'streamada.com', 'www.streamada.com']
 
-CORS_ALLOWED_ORIGINS = ['http://localhost:4200']
+CORS_ALLOWED_ORIGINS = ['http://localhost:4200',
+                        'https://streamada.com',
+                        'https://www.streamada.com']
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:4200",
+    'https://streamada.com',
+    'https://www.streamada.com',
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -105,7 +109,6 @@ RQ_QUEUES = {
     }
 }
 
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -177,8 +180,6 @@ EMAIL_PORT = config('EMAIL_PORT', cast=int)
 EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
-
-
 
 
 if 'test' in sys.argv or 'test_coverage' in sys.argv:

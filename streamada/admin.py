@@ -7,7 +7,8 @@ from django.urls import path
 
 
 class VideoAdmin(admin.ModelAdmin):
-    list_display = ('title', 'rq_dashboard_link')
+    list_display = ('title', 'id', 'genre', 'rq_dashboard_link')
+    readonly_fields = ('id',)
 
     def rq_dashboard_link(self, obj):
         return format_html('<a href="{}" target="_blank">RQ Dashboard</a>', '/django-rq/')
