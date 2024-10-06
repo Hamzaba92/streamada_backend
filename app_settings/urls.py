@@ -35,7 +35,6 @@ urlpatterns = [
     path('api/videos/', VideoListAPIView.as_view(), name='video-list'),
     path('api/videos/<int:id>/', VideoDetailAPIView.as_view(), name='video-detail'),
     path('django-rq/', include('django_rq.urls')),
-]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
+]
 
 

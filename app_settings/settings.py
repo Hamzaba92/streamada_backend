@@ -25,7 +25,7 @@ from django.core.cache.backends.base import DEFAULT_TIMEOUT
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'streamada.com', 'www.streamada.com']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'streamada.com', 'www.streamada.com', '34.175.190.203']
 
 CORS_ALLOWED_ORIGINS = ['http://localhost:4200',
                         'https://streamada.com',
@@ -98,7 +98,13 @@ MEDIA_URL = '/media/'
 
 ROOT_URLCONF = 'app_settings.urls'
 
-DEBUG=True
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static',  'staticfiles')
+
+
+
+
+DEBUG=False
 
 RQ_QUEUES = {
     'default': {
@@ -182,18 +188,11 @@ EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 
 
-if 'test' in sys.argv or 'test_coverage' in sys.argv:
-    # Use SQLite for testing
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': ':memory:', 
-        }
-    }
-else:
-    # Use PostgreSQL in development and production
-    try:
-        DATABASES = {
+
+
+
+
+DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': config('DB_NAME'),
@@ -201,13 +200,5 @@ else:
             'PASSWORD': config('DB_PASSWORD'),
             'HOST': config('DB_HOST'),
             'PORT': config('DB_PORT'),
-        }
-    }
-    except UndefinedValueError:
-    # Fallback to SQLite if any PostgreSQL config is missing
-        DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
         }
     }
