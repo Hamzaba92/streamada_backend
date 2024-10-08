@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect
 from .models import Video
 from django.utils.html import format_html
 from django.urls import path
-
+from django.utils.translation import gettext_lazy as _
 
 
 class VideoAdmin(admin.ModelAdmin):
@@ -32,5 +32,7 @@ class RQDashboardAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Video, VideoAdmin)
-
+admin.site.site_header = _('Streamada Admin-Panel')
+admin.site.site_title = _('Streamada Server')
+admin.site.index_title = _('Streamada administration')
 
