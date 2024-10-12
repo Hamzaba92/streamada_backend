@@ -35,24 +35,24 @@ python3 -m venv env
 source env/bin/activate
 ```
 
-### 5. Install all requirements listed in requirements.txt
+### 4. Install all requirements listed in requirements.txt
 ```bash
 pip install -r requirements.txt
 ```
 
-### 6. Create a database
+### 5. Create a database
 ```bash 
 linux: 1. => python3 manage.py makemigrations 2. => python3 manage.py migrate
 windwos: 1. => python manage.py makemigrations 2. => python manage.py migrate
 ```
 
-### 7. Create a superuser to access the admin panel
+### 6. Create a superuser to access the admin panel
 ```bash
 linux: python3 manage.py createsuperuser
 windows: python manage.py createsuperuser
 ```
 
-### 8. Start the server
+### 7. Start the server
 ```bash
 linux: python3 manage.py runserver
 windows: python manage.py runserver

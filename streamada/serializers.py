@@ -8,13 +8,15 @@ from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
 from django.contrib.auth import authenticate
 from django.utils.http import urlsafe_base64_decode
-
 from streamada.models import Video
+from streamada.tasks import send_activation_email
 
 
 
 class UserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
+    password = serializers.CharField(
+        write_only=True, required=True, validators=[validate_password]
+    )
     confirm_password = serializers.CharField(write_only=True, required=True)
 
     class Meta:
@@ -25,7 +27,7 @@ class UserSerializer(serializers.ModelSerializer):
         if data['password'] != data['confirm_password']:
             raise serializers.ValidationError("Password do not match")
         return data
-    
+
     def validate_email(self, value):
         if User.objects.filter(email=value).exists():
             raise serializers.ValidationError("A user with this email already exists.")
@@ -48,28 +50,8 @@ class UserSerializer(serializers.ModelSerializer):
         user.set_password(validated_data['password'])  
         user.save()
         
-        token = default_token_generator.make_token(user)
-        uid = urlsafe_base64_encode(force_bytes(user.pk))
-
-        activation_link = f"{self.context['request'].scheme}://{self.context['request'].get_host()}/api/activate/{uid}/{token}/"
-
-        subject = 'Please Confirm your E-mail'
-        from_email = 'noreply@streamada.com'
-        recipient_list = [user.email]
-
-        html_message = render_to_string('send_activation_link.html', {
-            'user': user,
-            'activation_link': activation_link
-        })
-
-        email = EmailMultiAlternatives(
-            subject=subject,
-            body=f'Hallo {user.first_name} {user.last_name},\nPlease click the link below to activate your account:\n{activation_link}',
-            from_email=from_email,
-            to=recipient_list
-        )
-        email.attach_alternative(html_message, "text/html")
-        email.send()
+        send_activation_email(user, request)
+        
         return user
 
 
@@ -92,7 +74,7 @@ class LoginSerializer(serializers.Serializer):
         
         user = authenticate(username=email, password=password)
         if user is None:
-            raise serializers.ValidationError("password is wrong.")
+            raise serializers.ValidationError("password or Email wrong.")
         
         data['user'] = user
         return data 
